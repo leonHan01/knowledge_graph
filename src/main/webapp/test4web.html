@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <title>han's pic</title>
+    <style>
+        #div1 {
+            width: 1950px;
+            height: 40px;
+            background: green;
+            position: absolute;
+            left: -1950px;
+        }
+
+        #div1 span {
+            position: absolute;
+            width: 20px;
+            height: 40px;
+            line-height: 20px;
+            background: blue;
+            right: -20px;
+            top: 0px;
+        }
+
+        body {
+            text-align: center
+        }
+    </style>
+</head>
+<body style="background-color: #555555">
+<!--<input type="text" id="aaa">条件筛选</input>-->
+<div id="div1">
+    <span>~</span>
+</div>
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+<button onclick="getPreDeletePic()" style="width:200px;height:70px;font-size:50px;">后悔</button>
+<button onclick="startQuery()" style="width:200px;height:70px;font-size:50px;">刷新</button>
+<button onclick="likePic(5)" style="width:200px;height:70px;font-size:50px;">5</button>
+<button onclick="likePic(4)" style="width:200px;height:70px;font-size:50px;">4</button>
+<button onclick="likePic(3)" style="width:200px;height:70px;font-size:50px;">3</button>
+<button onclick="likePic(2)" style="width:200px;height:70px;font-size:50px;">2</button>
+<button onclick="likePic(1)" style="width:200px;height:70px;font-size:50px;">1</button>
+<button onclick="unlikePic()" style="width:200px;height:70px;font-size:50px;">NO</button>
+<button onclick="skipAuthor()" style="width:200px;height:70px;font-size:50px;">SKIP</button>
+<div id="result" style="color:red"></div>
+<button onclick="unlikePic()" style="width:3030px;height:260px;font-size:50px;">NO</button>
+<button onclick="deleteAll()" style="width:3030px;height:260px;font-size:50px;">删除全部！！</button>
+<script>
+    var picId;
+
+    function getJSON(url) {
+        return new Promise(function (resolve, reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('get', url, true);
+            xhr.responseType = 'json';
+            xhr.dataType = 'JSONP',  // 处理Ajax跨域问题
+                xhr.onload = function () {
+                    var status = xhr.status;
+                    if (status == 200) {
+                        console.log('成功：' + xhr.response);
+                        resolve(xhr.response);
+                    } else {
+                        reject(status);
+                    }
+                };
+            xhr.send();
+        });
+    }
+
+    function startHttpQuery() {
+        var url = "http://127.0.0.1:8080/getPic";
+        getJSON(url).then(function (data) {
+                picId = data.picId;
+                var imageStr = "<img src=\"" + data.imgUrl + "\" alt=\"图片太大无法显示，试试刷新哦\" style=\"height:auto;width:3600px;\"/>"
+                document.getElementById("result").innerHTML = imageStr;
+            },
+            function (status) {
+                alert('Something went wrong.');
+            });
+    }
+
+    function getPreDeletePicQuery() {
+        var url = "http://127.0.0.1:8080/getPreDeletePic";
+        getJSON(url).then(function (data) {
+                picId = data.picId;
+                var imageStr = "<img src=\"" + data.imgUrl + "\" alt=\"图片太大无法显示，试试刷新哦\" style=\"height:auto;width:3600px;\"/>"
+                document.getElementById("result").innerHTML = imageStr;
+            },
+            function (status) {
+                alert('Something went wrong.');
+            });
+    }
+
+    function likePic(score) {
+        startMove(0);
+        var url = "http://127.0.0.1:8080/like";
+        if (null != picId) {
+            //get方法的查询参数设置
+            url = url + "?picId=" + picId + "&score=" + score;
+        }
+        getJSON(url).then(function (data) {
+                var info = "喜欢成功：" + picId;
+                picId = data.picId;
+                var imageStr = "<img src=\"" + data.imgUrl + "\" alt=\"图片太大无法显示，试试刷新哦\" style=\"height:auto;width:3600px;\"/>"
+                document.getElementById("result").innerHTML = imageStr;
+                startMove(-1950);
+            },
+            function (status) {
+                alert('Something went wrong.');
+            });
+    }
+
+
+    function unlikePic() {
+        startMove(0);
+        var url = "http://127.0.0.1:8080/unlike";
+        if (null != picId) {
+            //get方法的查询参数设置
+            url = url + "?picId=" + picId;
+        }
+        getJSON(url).then(function (data) {
+                var info = "删除成功：" + picId;
+                picId = data.picId;
+                var imageStr = "<img src=\"" + data.imgUrl + "\" alt=\"图片太大无法显示，试试刷新哦\" style=\"height:auto;width:3600px;\"/>"
+                document.getElementById("result").innerHTML = imageStr;
+                startMove(-1950);
+            },
+            function (status) {
+                alert('Something went wrong.');
+            });
+    }
+
+    function skipAuthor() {
+        startMove(0);
+        var url = "http://127.0.0.1:8080/skipAuthor";
+        getJSON(url).then(function (data) {
+                picId = data.picId;
+                var imageStr = "<img src=\"" + data.imgUrl + "\" alt=\"图片太大无法显示，试试刷新哦\" style=\"height:auto;width:3600px;\"/>"
+                document.getElementById("result").innerHTML = imageStr;
+                startMove(-1950);
+            },
+            function (status) {
+                alert('Something went wrong.');
+            });
+    }
+
+    function deleteAll() {
+        startMove(0);
+        var url = "http://127.0.0.1:8080/deleteAll";
+        getJSON(url).then(function (data) {
+                picId = data.picId;
+                var imageStr = "<img src=\"" + data.imgUrl + "\" alt=\"图片太大无法显示，试试刷新哦\" style=\"height:auto;width:3600px;\"/>"
+                document.getElementById("result").innerHTML = imageStr;
+                startMove(-1950);
+            },
+            function (status) {
+                alert('Something went wrong.');
+            });
+    }
+
+    function startQuery() {
+        //var bank=document.getElementById("aaa").value;
+        startHttpQuery();
+    }
+
+    function getPreDeletePic() {
+        //var bank=document.getElementById("aaa").value;
+        getPreDeletePicQuery();
+    }
+
+    var timer = null;
+
+    function startMove(iTarget) {
+        var oDiv = document.getElementById('div1');
+
+        clearInterval(timer);
+        timer = setInterval(function () {
+            var speed = 5;
+
+            if (oDiv.offsetLeft > iTarget) {
+                speed = -50;
+            }
+
+            if (oDiv.offsetLeft == iTarget) {
+                clearInterval(timer);
+            }
+            else {
+                oDiv.style.left = oDiv.offsetLeft + speed + 'px';
+            }
+        }, 30);
+    }
+</script>
+</body>
+</html>
